@@ -6,7 +6,7 @@ left, right = st.columns([4, 1])
 
 with left:
     df = pd.DataFrame(
-        np.random.randn(1000, 2) / [50, 50] + [37.76, -122.4],
+        np.random.randn(20, 2) / [100, 100] + [52.668528, 16.789972],
         columns=["lat", "lon"],
     )
     st.map(df)
@@ -16,4 +16,3 @@ with right:
     st.write("Here you can plan your route in the forest")
     distance = st.slider("Set maximum distance", 0, 100, 1)
     st.write(f"Distance: {distance} km")
-    
