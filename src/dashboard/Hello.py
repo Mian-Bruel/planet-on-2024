@@ -1,6 +1,6 @@
 import streamlit as st
 from utils.utils import filter_and_sort_events
-from utils.mock_data import local_goal_percentage, events, news
+from utils.mock_data import local_progress, events, news
 
 st.set_page_config(
     page_title="Hello",
@@ -11,11 +11,40 @@ st.set_page_config(
 # Filter and sort events using the utility function
 upcoming_events = filter_and_sort_events(events)
 
-st.write("# Welcome to Oborniki Forest! 🌲")
+st.markdown(
+    """
+    <div style="text-align: center;">
+        <h1>Welcome to Oborniki Forest!</h1>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
-# Add progress bar at the top
-st.markdown(f"### Local Goal Progress 🌟 ({local_goal_percentage}%)")
-st.progress(local_goal_percentage / 100)
+
+st.markdown(
+    """
+    <div style="text-align: center;">
+        <h2>🌳 Local Goals Progress</h2>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+# Centered content for each progress item
+for item in local_progress:
+    st.markdown(
+        f"""
+        <div style="text-align: center;">
+            <h3>{item['title']}</h3>
+            <p> {item['description']}</p>
+            <div style="width: 50%; margin: 0 auto;">
+                <progress value="{item['progress_percentage']}" max="100" style="width: 100%; height: 20px;"></progress>
+            </div>
+            <p><strong>Progress:</strong> {item['progress_percentage']}%</p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
 st.sidebar.success("Select a demo above.")
 
