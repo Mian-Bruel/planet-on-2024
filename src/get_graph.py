@@ -111,11 +111,14 @@ def plot_graph_subset(G, center_node=None, radius=0.01):
 
 if __name__ == "__main__":
     # Load your data
-    latitude = 52.69238
-    longitude = 16.78041
-    radius = 3000  # Buffer radius in meters
-    pavement_tags = {"highway": ["footway", "track", "path", "cycleway"]}
+    
+    latitude = 52.6578
+    longitude = 16.81660
+    radius = 3000
+    pavement_tags = {"highway": ["track", "path", "footway", "cycleway"]}
     pavements_gdf = ox.features.features_from_point((latitude, longitude), tags=pavement_tags, dist=radius)
+    pavements_gdf = pavements_gdf.to_crs(epsg=4326)
+
 
     # Split LineStrings at intersections
     split_geometries = split_linestrings_at_intersections(pavements_gdf.geometry)
@@ -124,11 +127,11 @@ if __name__ == "__main__":
     G = create_graph_from_geometries(split_geometries)
     G = G.to_undirected()
 
-    edges = 0
-    for node in G.nodes:
-        edges += len(G.edges(node)) if len(G.edges(node)) >= 3 else 0
+    # edges = 0
+    # for node in G.nodes:
+    #     edges += len(G.edges(node)) if len(G.edges(node)) >= 3 else 0
+    # print(edges)
 
-    print(edges)
 
     # save to pickle
     with open('graph.pkl', 'wb') as f:
