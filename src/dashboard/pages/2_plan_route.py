@@ -6,6 +6,10 @@ import pickle
 from src.dashboard.pathfinder.Pathfinder import PathFinder
 from src.dashboard.pathfinder.utils import get_info, get_paths_distance
 
+st.set_page_config(
+    layout="wide",
+)
+
 if "path" not in st.session_state:
     st.session_state["path"] = None
 
@@ -22,7 +26,7 @@ center_x = sum(n[0] for n in G.nodes) / len(G.nodes)
 CENTER_START = [center_y, center_x]
 
 
-left, right = st.columns([3, 2])
+left, right = st.columns([4, 2])
 with left:
     # Create the map
     m = folium.Map(location=CENTER_START, zoom_start=ZOOM_START)
@@ -41,7 +45,7 @@ with left:
     st_folium(
         m,
         key="new",
-        height=500,
+        height=700,
         width=800,
     )
 
@@ -49,10 +53,10 @@ with right:
     # Sidebar or additional functionality
     st.write("## Route Options")
     st.write("Here you can plan your route in the forest")
-    distance = st.slider("Set maximum distance (km)", 0, 100, 2)
+    distance = st.slider("Set maximum distance (km)", 0, 20, 2)
     if st.button("Find Route"):
         start_index = random.randint(0, len(points) - 1)
-        pathfinder = PathFinder(points, connections, distances, target=distance * 1000, s=start_index)
+        pathfinder = PathFinder(points, connections, distances, target=distance * 1000, s=start_index, precision=500)
         path = pathfinder.get_closest_path()
         st.session_state["path"] = path
         st.rerun()
