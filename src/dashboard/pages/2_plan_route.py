@@ -3,14 +3,22 @@ import folium
 from streamlit_folium import st_folium
 import streamlit as st
 import pickle
-import networkx as nx
+from src.dashboard.pathfinder.Pathfinder import PathFinder
+from src.dashboard.pathfinder.utils import get_info, get_paths_distance
 
-# Starting constants for map center and zoom
-# CENTER_START = [52.668528, 16.789972]
-ZOOM_START = 13
+st.set_page_config(
+    layout="wide",
+)
+
+if "path" not in st.session_state:
+    st.session_state["path"] = None
+
+ZOOM_START = 12
 
 # Get graph from data
-G = pickle.load(open("data/graph.dupa", "rb"))
+G = pickle.load(open("data/graph-old.pkl", "rb"))
+
+points, connections, distances = get_info(G, "olddie_but_goldie")
 
 # Calculate the center of the graph
 center_y = sum(n[1] for n in G.nodes) / len(G.nodes)
@@ -18,49 +26,26 @@ center_x = sum(n[0] for n in G.nodes) / len(G.nodes)
 CENTER_START = [center_y, center_x]
 
 
-left, right = st.columns([3, 2])
+left, right = st.columns([4, 2])
 with left:
     # Create the map
     m = folium.Map(location=CENTER_START, zoom_start=ZOOM_START)
 
-    # Add graph nodes and edges to the map
-    for node, data in G.nodes(data=True):
-        # Extract node coordinates
-        if 'y' in data and 'x' in data:
-            folium.CircleMarker(
-                location=(data['y'], data['x']),
-                radius=3,
-                color="blue",
-                fill=True,
-                fill_opacity=0.8,
-            ).add_to(m)
+    if st.session_state["path"]:
+        coords = []
+        for i in range(len(st.session_state["path"])):
+            u = st.session_state["path"][i]
+            coords.append([list(G.nodes)[u][1], list(G.nodes)[u][0]])
 
-    for u, v, edge_data in G.edges(data=True):
-        # Extract coordinates for the edge's nodes
-        if 'geometry' in edge_data:
-            # If the edge has a geometry, use it directly
-            folium.PolyLine(
-                locations=[(point.y, point.x) for point in edge_data['geometry'].coords],
-                color="green",
-                weight=2,
-                opacity=0.7,
-            ).add_to(m)
-        else:
-            # Otherwise, use the endpoints of the edge
-            u_coords = (G.nodes[u]['y'], G.nodes[u]['x'])
-            v_coords = (G.nodes[v]['y'], G.nodes[v]['x'])
-            folium.PolyLine(
-                locations=[u_coords, v_coords],
-                color="green",
-                weight=2,
-                opacity=0.7,
-            ).add_to(m)
+        fg = folium.FeatureGroup("Lines")
+        folium.PolyLine(coords).add_to(fg)
+        m.add_child(fg)
 
     # Display the map in the Streamlit app
     st_folium(
         m,
         key="new",
-        height=500,
+        height=700,
         width=800,
     )
 
@@ -68,5 +53,17 @@ with right:
     # Sidebar or additional functionality
     st.write("## Route Options")
     st.write("Here you can plan your route in the forest")
-    distance = st.slider("Set maximum distance", 0, 100, 1)
-    st.write(f"Distance: {distance} km")
+    distance = st.slider("Set maximum distance (km)", 0, 20, 2)
+    if st.button("Find Route"):
+        start_index = random.randint(0, len(points) - 1)
+        pathfinder = PathFinder(points, connections, distances, target=distance * 1000, s=start_index, precision=500)
+        path = pathfinder.get_closest_path()
+        st.session_state["path"] = path
+        st.rerun()
+
+    if st.session_state["path"] is not None:
+        distance = get_paths_distance(st.session_state["path"], distances)
+        st.write(f"""
+                 Found a great match for your route!
+                 The total distance is {distance / 1000:.2f} km.
+                 """)
