@@ -67,9 +67,9 @@ Before running the application, you need to have the following installed:
 
 2. Create a virtual environment (optional but recommended):
     ```bash
-    python -m venv venv
-    source venv/bin/activate  # For Linux/Mac
-    venv\Scripts\activate     # For Windows
+    python -m venv .venv
+    source .venv/bin/activate  # For Linux/Mac
+    .venv\Scripts\activate     # For Windows
     ```
 
 3. Install the required libraries:
@@ -79,7 +79,7 @@ Before running the application, you need to have the following installed:
 
 4. Run the Streamlit application:
     ```bash
-    streamlit run Hello.py
+    python -m streamlit run src/dasahboard/Hello.py
     ```
 
 5. Open your browser and navigate to `http://localhost:8501` to view the application.
