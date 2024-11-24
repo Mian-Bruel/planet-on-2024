@@ -7,16 +7,6 @@ local_progress = [
         "description": "Planted 500 oak trees in the western forest to combat deforestation.",
         "progress_percentage": 20
     },
-    {
-        "title": "Bird Nesting Initiative",
-        "description": "Installed 50 birdhouses to support local avian species.",
-        "progress_percentage": 80
-    },
-    {
-        "title": "Wildflower Meadow Restoration",
-        "description": "Restoring 10 hectares of wildflower meadows to support pollinators.",
-        "progress_percentage": 40
-    },
 ]
 
 # Mock data for events with additional info
