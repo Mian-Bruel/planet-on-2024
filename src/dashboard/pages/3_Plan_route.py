@@ -1,8 +1,11 @@
 import random
 import folium
+from matplotlib import pyplot as plt
 from streamlit_folium import st_folium
 import streamlit as st
 import pickle
+import numpy as np
+from src.dashboard.pathfinder.altitude import read_hgt
 from src.dashboard.pathfinder.Pathfinder import PathFinder
 from src.dashboard.pathfinder.utils import get_info, get_paths_distance
 
@@ -17,6 +20,7 @@ ZOOM_START = 12
 
 # Get graph from data
 G = pickle.load(open("data/graph-old.pkl", "rb"))
+
 
 points, connections, distances = get_info(G, "olddie_but_goldie")
 
@@ -52,7 +56,6 @@ with left:
 with right:
     # Sidebar or additional functionality
     st.write("## Route Options")
-    st.write("Here you can plan your route in the forest")
     distance = st.slider("Set maximum distance (km)", 0, 20, 2)
     if st.button("Find Route"):
         start_index = random.randint(0, len(points) - 1)
@@ -67,3 +70,17 @@ with right:
                  Found a great match for your route!
                  The total distance is {distance / 1000:.2f} km.
                  """)
+        file = "data/N52E016.hgt"
+        elevations = []
+        for node in st.session_state["path"]:
+            lng, lat  = list(G.nodes())[node]
+            elevations.append(read_hgt(file, lat, lng))
+
+        st.write(f"Average elevation: {np.mean(elevations):.2f}")
+        st.write(f"Max elevation: {np.max(elevations)}")
+        st.write(f"Min elevation: {np.min(elevations)}")
+
+        fig = plt.figure()
+        plt.plot(elevations)
+        plt.title('Elevation Profile')
+        st.pyplot(fig)
