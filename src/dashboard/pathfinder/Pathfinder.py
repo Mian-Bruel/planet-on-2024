@@ -80,7 +80,3 @@ class PathFinder:
             return p1, p2
         else:
             return p2, p1
-
-# usage
-# finder = PathFinder(points, connections, distances)
-# finder.get_closest_path()
